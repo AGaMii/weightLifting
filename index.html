@@ -38,6 +38,18 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;}
 .abtn{width:34px;height:34px;border-radius:8px;border:.5px solid var(--bd2);background:var(--sf);font-size:18px;cursor:pointer;color:var(--tx2);display:flex;align-items:center;justify-content:center;}
 /* ex card */
 .exc{background:var(--card);border:.5px solid var(--bd);border-radius:var(--ra);padding:14px;margin-bottom:10px;}
+.exc-acc{border-color:rgba(186,117,23,.3);background:rgba(186,117,23,.03);}
+/* Volume banner */
+.vol-banner{background:var(--card);border:.5px solid var(--bd);border-radius:var(--ra);padding:12px 14px;margin-bottom:12px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;}
+.vol-item{display:flex;flex-direction:column;gap:2px;flex:1;min-width:80px;}
+.vol-label{font-size:10px;color:var(--tx2);}
+.vol-value{font-size:17px;font-weight:700;color:var(--tx);}
+.vol-unit{font-size:10px;color:var(--tx2);font-weight:400;}
+.vol-bar-wrap{width:100%;margin-top:6px;}
+.vol-bar-label{font-size:10px;color:var(--tx2);margin-bottom:3px;}
+.vol-bar-track{height:6px;background:var(--sf);border-radius:3px;overflow:hidden;}
+.vol-bar-fill{height:100%;border-radius:3px;transition:width .4s;}
+.vol-status{font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;white-space:nowrap;}
 .exn{font-size:15px;font-weight:600;color:var(--tx);margin-bottom:2px;}
 .exd{font-size:11px;color:var(--b);margin-bottom:6px;font-style:italic;}
 .exm{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
@@ -153,6 +165,7 @@ select.pinp{appearance:none;}
         <button class="abtn" onclick="changeDay(1)">&#8250;</button>
       </div>
     </div>
+    <div id="VOL_BANNER"></div>
     <div id="EX_LIST"></div>
     <button class="ghostb" id="BTN_TIMER" onclick="toggleTimer()"></button>
     <div class="tsec" id="TIMER_SEC" style="display:none;">
@@ -295,43 +308,55 @@ select.pinp{appearance:none;}
 <script>
 // ===== DATA =====
 var EX_DEFS = [
-  // Day 1 - Snatch focus
+  // Day 1 - BIG: Snatch focus (Classic lifts + Squat + Pull)
+  // Est. ~90-100 min main work
   [
-    {prKey:'snatch',    pct:0.72, sets:5, reps:'3',   rest:180, drv:null},
-    {prKey:'snatch',    pct:0.88, sets:4, reps:'2',   rest:150, drv:{fromKey:'snatch',  fromPct:88, label:'hangsnatch'}},
-    {prKey:'snatchpull',pct:0.90, sets:4, reps:'3',   rest:150, drv:null},
-    {prKey:'frontsquat',pct:0.65, sets:3, reps:'5',   rest:120, drv:null},
-    {prKey:'deadlift',  pct:0.78, sets:3, reps:'5',   rest:150, drv:null}
+    {prKey:'snatch',     pct:0.72, sets:5, reps:'3',   rest:180, drv:null,     acc:false},
+    {prKey:'snatch',     pct:0.88, sets:4, reps:'2',   rest:150, drv:{fromKey:'snatch',fromPct:88,label:'hangsnatch'}, acc:false},
+    {prKey:'snatchpull', pct:0.90, sets:4, reps:'3',   rest:150, drv:null,     acc:false},
+    {prKey:'squat',      pct:0.80, sets:4, reps:'4',   rest:180, drv:null,     acc:false},
+    {prKey:'squat',      pct:0.65, sets:3, reps:'3',   rest:150, drv:null,     acc:true},
+    {prKey:'squat',      pct:0.50, sets:3, reps:'0',   rest:60,  drv:null,     acc:true},
+    {prKey:'none',       pct:0,    sets:3, reps:'15',  rest:60,  drv:null,     acc:true}
   ],
-  // Day 2 - C&J focus
+  // Day 2 - LITTLE: Technique + Pull + Press
+  // Est. ~80-90 min main work
   [
-    {prKey:'cleanjerk', pct:0.78, sets:5, reps:'2+1', rest:180, drv:null},
-    {prKey:'cleanjerk', pct:0.88, sets:4, reps:'3',   rest:150, drv:{fromKey:'cleanjerk',fromPct:88, label:'hangclean'}},
-    {prKey:'cleanjerk', pct:0.72, sets:4, reps:'3',   rest:150, drv:null},
-    {prKey:'frontsquat',pct:0.80, sets:4, reps:'4',   rest:150, drv:null},
-    {prKey:'press',     pct:0.72, sets:3, reps:'6',   rest:120, drv:null}
+    {prKey:'snatch',     pct:0.68, sets:5, reps:'2',   rest:150, drv:null,     acc:false},
+    {prKey:'cleanjerk',  pct:0.88, sets:4, reps:'3',   rest:150, drv:{fromKey:'cleanjerk',fromPct:88,label:'hangclean'}, acc:false},
+    {prKey:'snatchpull', pct:0.85, sets:4, reps:'3',   rest:120, drv:null,     acc:false},
+    {prKey:'frontsquat', pct:0.70, sets:3, reps:'5',   rest:120, drv:null,     acc:false},
+    {prKey:'snatch',     pct:0.60, sets:3, reps:'3',   rest:120, drv:null,     acc:true},
+    {prKey:'press',      pct:0.60, sets:3, reps:'6',   rest:90,  drv:null,     acc:true},
+    {prKey:'none',       pct:0,    sets:3, reps:'10',  rest:60,  drv:null,     acc:true}
   ],
-  // Day 3 - Strength
+  // Day 3 - BIG: C&J + Squat Strength (heaviest day)
+  // Est. ~95-105 min main work
   [
-    {prKey:'squat',     pct:0.85, sets:5, reps:'3',   rest:180, drv:null},
-    {prKey:'deadlift',  pct:0.82, sets:4, reps:'4',   rest:180, drv:null},
-    {prKey:'snatchpull',pct:0.90, sets:3, reps:'3',   rest:150, drv:null},
-    {prKey:'press',     pct:0.76, sets:4, reps:'5',   rest:120, drv:null},
-    {prKey:'deadlift',  pct:0.65, sets:3, reps:'8',   rest:90,  drv:null}
+    {prKey:'cleanjerk',  pct:0.78, sets:5, reps:'2+1', rest:180, drv:null,     acc:false},
+    {prKey:'cleanjerk',  pct:0.72, sets:4, reps:'3',   rest:150, drv:null,     acc:false},
+    {prKey:'squat',      pct:0.85, sets:4, reps:'3',   rest:180, drv:null,     acc:false},
+    {prKey:'squat',      pct:0.70, sets:3, reps:'3',   rest:150, drv:null,     acc:true},
+    {prKey:'deadlift',   pct:0.75, sets:3, reps:'3',   rest:150, drv:null,     acc:true},
+    {prKey:'none',       pct:0,    sets:3, reps:'15',  rest:60,  drv:null,     acc:true},
+    {prKey:'none',       pct:0,    sets:3, reps:'0',   rest:60,  drv:null,     acc:true}
   ],
-  // Day 4 - Integration
+  // Day 4 - LITTLE: Power + Accessory strength
+  // Est. ~80-90 min main work
   [
-    {prKey:'snatch',    pct:0.72, sets:5, reps:'3',   rest:150, drv:null},
-    {prKey:'cleanjerk', pct:0.78, sets:4, reps:'3',   rest:150, drv:null},
-    {prKey:'cleanjerk', pct:0.76, sets:4, reps:'3',   rest:150, drv:null},
-    {prKey:'frontsquat',pct:0.76, sets:3, reps:'5',   rest:120, drv:null},
-    {prKey:'deadlift',  pct:0.65, sets:3, reps:'8',   rest:90,  drv:null}
+    {prKey:'snatch',     pct:0.70, sets:5, reps:'3',   rest:150, drv:null,     acc:false},
+    {prKey:'cleanjerk',  pct:0.75, sets:4, reps:'3',   rest:150, drv:null,     acc:false},
+    {prKey:'frontsquat', pct:0.75, sets:4, reps:'4',   rest:150, drv:null,     acc:false},
+    {prKey:'deadlift',   pct:0.60, sets:3, reps:'4',   rest:120, drv:null,     acc:true},
+    {prKey:'press',      pct:0.65, sets:3, reps:'5',   rest:90,  drv:null,     acc:true},
+    {prKey:'none',       pct:0,    sets:3, reps:'12',  rest:60,  drv:null,     acc:true},
+    {prKey:'none',       pct:0,    sets:3, reps:'0',   rest:60,  drv:null,     acc:true}
   ]
 ];
 
-var DIRECT_KEYS = ['snatch','snatchpull','cleanjerk','deadlift','squat','frontsquat','press'];
-var DEFAULTS = {snatch:70,snatchpull:90,cleanjerk:90,deadlift:120,squat:110,frontsquat:90,press:55};
-var EX_COLORS = {snatch:'#1D9E75',cleanjerk:'#378ADD',deadlift:'#D85A30',squat:'#7F77DD',frontsquat:'#7F77DD',press:'#BA7517',hangsnatch:'#1D9E75',hangclean:'#378ADD'};
+var DIRECT_KEYS = ['snatch','snatchpull','cleanjerk','deadlift','squat','frontsquat','press','pinsquat','pindeadlift'];
+var DEFAULTS = {snatch:70,snatchpull:90,cleanjerk:90,deadlift:120,squat:110,frontsquat:90,press:55,pinsquat:100,pindeadlift:130};
+var EX_COLORS = {snatch:'#1D9E75',cleanjerk:'#378ADD',deadlift:'#D85A30',squat:'#7F77DD',frontsquat:'#7F77DD',press:'#BA7517',hangsnatch:'#1D9E75',hangclean:'#378ADD',snatchpull:'#0F6E56',pinsquat:'#9B59B6',pindeadlift:'#E67E22'};
 
 // ===== TRANSLATIONS =====
 var LNG = {
@@ -370,16 +395,16 @@ var LNG = {
       rdl:'루마니안 데드리프트', sngrip:'스내치 그립 데드리프트', ohs:'오버헤드 스쿼트'
     },
     dayDefs:[
-      {title:'Day 1', sub:'스내치 집중 - 파워 + 기술'},
-      {title:'Day 2', sub:'클린&저크 집중 - 기술 + 근력'},
-      {title:'Day 3', sub:'최대 근력 집중'},
-      {title:'Day 4', sub:'통합 + 스피드 파워'}
+      {title:'Day 1', sub:'스내치 중심 (빅 데이)'},
+      {title:'Day 2', sub:'기술 + 풀 + 보조 (리틀 데이)'},
+      {title:'Day 3', sub:'클린&저크 + 최대 근력 (빅 데이)'},
+      {title:'Day 4', sub:'파워 + 보조 강화 (리틀 데이)'}
     ],
     exNames2:[
-      ['풀 스내치','행 스내치','스내치 풀','오버헤드 스쿼트','데드리프트'],
-      ['풀 클린&저크','행 클린','파워 저크','프론트 스쿼트','오버헤드 프레스'],
-      ['백 스쿼트','데드리프트','스내치 그립 데드리프트','오버헤드 프레스','루마니안 데드리프트'],
-      ['파워 스내치','파워 클린','스플릿 저크','프론트 스쿼트','루마니안 데드리프트']
+      ['풀 스내치','행 스내치','스내치 풀','백 스쿼트','오버헤드 스쿼트 (스내치 받기)','바벨 하이퍼익스텐션','크런치 / 복근'],
+      ['파워 스내치','행 클린','클린 풀','프론트 스쿼트','스내치 밸런스','비하인드 넥 스내치 프레스','힙 브릿지'],
+      ['풀 클린&저크','파워 저크','백 스쿼트','프론트 스쿼트 (클린 받기)','핀 데드리프트','바벨 하이퍼익스텐션','푸시업'],
+      ['파워 스내치','스플릿 저크','프론트 스쿼트','핀 스쿼트','오버헤드 프레스','V-싯업','할로우 바디 홀드']
     ],
     logOpts:[
       {v:'snatch',l:'풀 스내치'},{v:'cleanjerk',l:'클린&저크'},{v:'deadlift',l:'데드리프트'},
@@ -423,16 +448,16 @@ var LNG = {
       deadlift:'Deadlift', squat:'Back Squat', frontsquat:'Front Squat', press:'Overhead Press'
     },
     dayDefs:[
-      {title:'Day 1', sub:'Snatch Focus - Power + Technique'},
-      {title:'Day 2', sub:'C&J Focus - Technique + Strength'},
-      {title:'Day 3', sub:'Max Strength'},
-      {title:'Day 4', sub:'Integration + Speed Power'}
+      {title:'Day 1', sub:'Snatch Focus (Big Day)'},
+      {title:'Day 2', sub:'Technique + Pull + Accessory (Little Day)'},
+      {title:'Day 3', sub:'C&J + Max Strength (Big Day)'},
+      {title:'Day 4', sub:'Power + Accessory Strength (Little Day)'}
     ],
     exNames2:[
-      ['Full Snatch','Hang Snatch','Snatch Pull','Overhead Squat','Deadlift'],
-      ['Full Clean & Jerk','Hang Clean','Power Jerk','Front Squat','Overhead Press'],
-      ['Back Squat','Deadlift','Snatch Grip Deadlift','Overhead Press','Romanian Deadlift'],
-      ['Power Snatch','Power Clean','Split Jerk','Front Squat','Romanian Deadlift']
+      ['Full Snatch','Hang Snatch','Snatch Pull','Back Squat','Overhead Squat (Snatch Receiving)','Barbell Hyperextension','Crunch / Abs'],
+      ['Power Snatch','Hang Clean','Clean Pull','Front Squat','Snatch Balance','Behind-Neck Snatch Press','Hip Bridge'],
+      ['Full Clean & Jerk','Power Jerk','Back Squat','Front Squat (Clean Receiving)','Pin Deadlift','Barbell Hyperextension','Push-Up'],
+      ['Power Snatch','Split Jerk','Front Squat','Pin Squat','Overhead Press','V-Sit','Hollow Body Hold']
     ],
     logOpts:[
       {v:'snatch',l:'Full Snatch'},{v:'cleanjerk',l:'Clean & Jerk'},{v:'deadlift',l:'Deadlift'},
@@ -471,6 +496,7 @@ var tmpDows=[].concat(wDows);
 function L(){return LNG[lang];}
 function getPR(k){return prs[k]||DEFAULTS[k]||80;}
 function calcW(ex,wk){
+  if(ex.prKey==='none'||ex.pct===0) return 0;
   var basePR;
   if(ex.drv){
     basePR = Math.round(getPR(ex.drv.fromKey)*ex.drv.fromPct/100/2.5)*2.5;
@@ -480,6 +506,8 @@ function calcW(ex,wk){
   var mult = 1 + wk*(progRate/100);
   return Math.round(basePR*ex.pct*mult/2.5)*2.5;
 }
+function isBodyweight(ex){ return ex.prKey==='none'||ex.pct===0; }
+function isAccessory(ex){ return ex.acc===true; }
 function getWeekMult(i){return 1+i*(progRate/100);}
 function toast(m){var t=document.getElementById('TOAST');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2500);}
 function dStr(y,m,d){return y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');}
@@ -550,6 +578,76 @@ function renderHeader(){
 }
 
 // ===== TODAY =====
+// Prilepin chart: optimal rep ranges per intensity zone for Olympic lifts
+// Zone: [minPct, maxPct, repsPerSet_opt, totalReps_min, totalReps_opt, totalReps_max]
+var PRILEPIN = [
+  [0.55, 0.65, 6, 18, 24, 30],
+  [0.70, 0.75, 6, 12, 18, 24],
+  [0.80, 0.85, 4, 10, 15, 20],
+  [0.90, 1.00, 2,  4,  7, 10]
+];
+function getPrilepinZone(pct){
+  for(var i=0;i<PRILEPIN.length;i++){
+    if(pct>=PRILEPIN[i][0]&&pct<=PRILEPIN[i][1]) return PRILEPIN[i];
+  }
+  return null;
+}
+function calcDayVolume(dayIdx, weekIdx){
+  var totalKg=0, totalReps=0;
+  var snatchKg=0, snatchReps=0;
+  var cjKg=0, cjReps=0;
+  var prilepinReps=0, prilepinMin=0, prilepinMax=0;
+  EX_DEFS[dayIdx].forEach(function(ex){
+    if(isBodyweight(ex)||ex.acc) return;
+    var w=calcW(ex,weekIdx);
+    var reps=parseInt(ex.reps)||1;
+    var vol=w*reps*ex.sets;
+    totalKg+=vol; totalReps+=reps*ex.sets;
+    // Olympic lifts only for Prilepin
+    if(ex.prKey==='snatch'||ex.prKey==='snatchpull'){
+      snatchKg+=vol; snatchReps+=reps*ex.sets;
+      var zone=getPrilepinZone(ex.pct*(1+(weekIdx*(progRate/100))));
+      if(zone){prilepinReps+=reps*ex.sets;prilepinMin+=zone[3];prilepinMax+=zone[5];prilepinMin=Math.round(prilepinMin/ex.sets);prilepinMax=Math.round(prilepinMax/ex.sets);}
+    }
+    if(ex.prKey==='cleanjerk'){
+      cjKg+=vol; cjReps+=reps*ex.sets;
+    }
+  });
+  return {totalKg:Math.round(totalKg),totalReps:totalReps,snatchKg:Math.round(snatchKg),snatchReps:snatchReps,cjKg:Math.round(cjKg),cjReps:cjReps,prilepinReps:prilepinReps,prilepinMin:prilepinMin||10,prilepinMax:prilepinMax||20};
+}
+function renderVolumeBanner(){
+  var l=L();
+  var v=calcDayVolume(curDay,curWeek);
+  var banner=document.getElementById('VOL_BANNER');
+  if(!banner) return;
+  var priPct=v.prilepinMax>0?Math.min(100,Math.round(v.prilepinReps/v.prilepinMax*100)):0;
+  var barColor=priPct<60?'var(--r)':priPct>100?'#BA7517':'var(--g)';
+  var statusText=priPct<60?(l.volLow||'부족'):(priPct>110?(l.volHigh||'과임'):(l.volOk||'적정'));
+  var statusBg=priPct<60?'rgba(226,75,74,.12)':priPct>110?'rgba(186,117,23,.12)':'rgba(29,158,117,.12)';
+  var statusColor=priPct<60?'var(--r)':priPct>110?'#BA7517':'var(--g)';
+  if(lang==='en'){statusText=priPct<60?'Low':priPct>110?'High':'OK';}
+  banner.innerHTML=
+    '<div class="vol-item">'+
+      '<span class="vol-label">'+(lang==='ko'?'일일 총볼륨':'총 볼륨')+'</span>'+
+      '<span class="vol-value">'+v.totalKg.toLocaleString()+'<span class="vol-unit"> kg</span></span>'+
+    '</div>'+
+    '<div class="vol-item">'+
+      '<span class="vol-label">'+(lang==='ko'?'스내치 볼륨':'Snatch Vol')+'</span>'+
+      '<span class="vol-value" style="color:var(--g)">'+v.snatchKg.toLocaleString()+'<span class="vol-unit"> kg</span></span>'+
+    '</div>'+
+    '<div class="vol-item">'+
+      '<span class="vol-label">'+(lang==='ko'?'C&J 볼륨':'C&J Vol')+'</span>'+
+      '<span class="vol-value" style="color:var(--b)">'+v.cjKg.toLocaleString()+'<span class="vol-unit"> kg</span></span>'+
+    '</div>'+
+    '<div class="vol-item" style="min-width:100%;margin-top:2px;">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">'+
+        '<span class="vol-label">Prilepin '+(lang==='ko'?'적정 범위':'range')+' ('+v.prilepinMin+'~'+v.prilepinMax+' reps)</span>'+
+        '<span class="vol-status" style="background:'+statusBg+';color:'+statusColor+'">'+statusText+'</span>'+
+      '</div>'+
+      '<div class="vol-bar-track"><div class="vol-bar-fill" style="width:'+Math.min(priPct,100)+'%;background:'+barColor+';"></div></div>'+
+      '<div style="font-size:10px;color:var(--tx2);margin-top:3px;">'+(lang==='ko'?'주종목 '+v.prilepinReps+'렌 / 기준 '+v.prilepinMax+'렌':'Main lifts '+v.prilepinReps+' reps / target '+v.prilepinMax)+'</div>'+
+    '</div>';
+}
 function renderToday(){
   var l=L();
   var dd=l.dayDefs[curDay];
@@ -581,26 +679,33 @@ function renderToday(){
   EX_DEFS[curDay].forEach(function(ex,ei){
     var exName=l.exNames2[curDay][ei];
     var w=calcW(ex,curWeek);
+    var bw=isBodyweight(ex);
+    var acc=isAccessory(ex);
     var div=document.createElement('div');
-    div.className='exc';
+    div.className='exc'+(acc?' exc-acc':'');
     var drvHtml='';
     if(ex.drv){
       var basePR=getPR(ex.drv.fromKey);
       var derived=Math.round(basePR*ex.drv.fromPct/100/2.5)*2.5;
-      var baseExName=l.exNames2[curDay][0];
-      drvHtml='<div class="exd">= '+l.exNames[ex.drv.fromKey]+' PR '+basePR+'kg x '+ex.drv.fromPct+'% → '+derived+'kg</div>';
+      drvHtml='<div class="exd">= '+l.exNames[ex.drv.fromKey]+' PR '+basePR+'kg × '+ex.drv.fromPct+'% → '+derived+'kg</div>';
     }
+    var accBadge=acc?'<span style="font-size:10px;background:rgba(186,117,23,.15);color:#BA7517;border-radius:4px;padding:2px 6px;margin-left:6px;">'+(lang==='ko'?'보조':'ACC')+'</span>':'';
+    var chipHtml=bw
+      ? '<span class="wchip" style="background:var(--sf);color:var(--tx2);">'+(lang==='ko'?'맨몸':'BW')+'</span>'
+      : '<span class="wchip">'+w+' kg</span>';
+    var repsDisp=ex.reps==='0'?(lang==='ko'?'30습 홀드':'30s hold'):ex.reps;
     var sets='';
     for(var s=0;s<ex.sets;s++){
       var k=setKey(ds,curDay,ei,s);
       var st=setStates[k]||'p';
-      sets+='<button class="sbtn'+(st==='d'?' done':st==='f'?' failed':'')+'" onclick="tapSet(\''+ds+'\','+curDay+','+ei+','+s+','+ex.rest+')">'+  (s+1)+'</button>';
+      sets+='<button class="sbtn'+(st==='d'?' done':st==='f'?' failed':'')+'" onclick="tapSet(\"'+ds+'\",'+curDay+','+ei+','+s+','+ex.rest+')">'+  (s+1)+'</button>';
     }
-    div.innerHTML='<div class="exn">'+exName+'</div>'+drvHtml+
-      '<div class="exm"><span class="wchip">'+w+' kg</span><span class="epct">'+ex.sets+'x'+ex.reps+' · '+Math.round(ex.pct*100)+'%</span></div>'+
+    div.innerHTML='<div class="exn">'+exName+accBadge+'</div>'+drvHtml+
+      '<div class="exm">'+chipHtml+'<span class="epct">'+ex.sets+'×'+repsDisp+(bw?'':' · '+Math.round(ex.pct*100)+'%')+'</span></div>'+
       '<div class="srow">'+sets+'</div>';
     list.appendChild(div);
   });
+  renderVolumeBanner();
 }
 
 function tapSet(ds,di,ei,si,rest){
@@ -784,8 +889,13 @@ function renderProgram(){
     var rows=EX_DEFS[di].map(function(ex,ei){
       var nm=l.exNames2[di][ei];
       var w=calcW(ex,curWeek);
-      var note=ex.drv?'<div class="pexnote">= '+l.exNames[ex.drv.fromKey]+' PR x '+ex.drv.fromPct+'%</div>':'';
-      return '<div class="pexr"><div><span class="pexn">'+nm+'</span>'+note+'</div><div class="pexrv">'+ex.sets+'x'+ex.reps+'<br><b>'+w+'kg</b></div></div>';
+      var bw=isBodyweight(ex);
+      var acc=isAccessory(ex);
+      var note=ex.drv?'<div class="pexnote">= '+l.exNames[ex.drv.fromKey]+' PR × '+ex.drv.fromPct+'%</div>':'';
+      var accTag=acc?'<span style="font-size:10px;color:#BA7517;"> ('+(lang==='ko'?'보조':'acc')+')</span>':'';
+      var repsDisp=ex.reps==='0'?(lang==='ko'?'30습 홀드':'30s hold'):ex.reps;
+      var wdisp=bw?(lang==='ko'?'맨몸':'BW'):(w+'kg');
+      return '<div class="pexr"><div><span class="pexn">'+nm+accTag+'</span>'+note+'</div><div class="pexrv">'+ex.sets+'×'+repsDisp+'<br><b>'+wdisp+'</b></div></div>';
     }).join('');
     d.innerHTML='<div class="pdtitle">'+dd.title+(dow!=null?' ('+l.dowNames[dow]+')':'')+' — '+dd.sub+'</div>'+rows;
     list.appendChild(d);
