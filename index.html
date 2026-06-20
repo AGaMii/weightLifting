@@ -167,10 +167,7 @@ select.pinp{appearance:none;}
     </div>
     <div id="VOL_BANNER"></div>
     <div id="EX_LIST"></div>
-    <div style="display:flex;gap:8px;margin-top:10px;">
-      <button class="ghostb" id="BTN_TIMER" onclick="toggleTimer()" style="flex:1;margin-top:0;"></button>
-      <button class="ghostb" id="BTN_RESET_DAY" onclick="confirmResetDay()" style="flex:0 0 auto;margin-top:0;padding:10px 14px;color:var(--r);border-color:rgba(226,75,74,.4);"></button>
-    </div>
+    <button class="ghostb" id="BTN_TIMER" onclick="toggleTimer()" style="margin-top:10px;"></button>
     <div class="tsec" id="TIMER_SEC" style="display:none;">
       <div class="rwrap">
         <svg width="100" height="100" viewBox="0 0 100 100">
@@ -550,16 +547,14 @@ function applyLang(){
   document.getElementById('AND2').textContent=l.and2;
   document.getElementById('T_NEXT').textContent=l.tNext;
   document.getElementById('T_ADJ').textContent=l.tAdj;
-  document.getElementById('T_CLOSE').textContent=l.tClose;
+  document.getElementById('T_CLOSE').textContent='Close';
   document.getElementById('BTN_TIMER').textContent=l.tOpen;
-  document.getElementById('T_BTN').textContent=tRun?l.tPause:l.tStart;
+  document.getElementById('T_BTN').textContent=tRun?'⏸':'▶ Start';
   document.getElementById('G_ADD').textContent=l.gAdd;
   document.getElementById('G_EX_L').textContent=l.gExL;
   document.getElementById('G_WT_L').textContent=l.gWtL;
   document.getElementById('G_DT_L').textContent=l.gDtL;
   document.getElementById('BTN_LOG').textContent=l.btnLog;
-  var rb=document.getElementById('BTN_RESET_DAY');
-  if(rb) rb.textContent=lang==='ko'?'하루 초기화':'Reset Today';
   var rba=document.getElementById('BTN_RESET_ALL');
   if(rba) rba.textContent=lang==='ko'?'전체 세트 초기화':'Reset All Sets';
   document.getElementById('G_HIST').textContent=l.gHist;
@@ -767,20 +762,20 @@ function confirmResetAll(){
 }
 
 // ===== TIMER =====
-function openTimer(s){tTotal=s;tLeft=s;tRun=false;clearInterval(tInt);updTDisp();document.getElementById('TIMER_SEC').style.display='block';tOpen=true;document.getElementById('T_BTN').textContent=L().tStart;document.getElementById('TIMER_SEC').scrollIntoView({behavior:'smooth',block:'nearest'});}
+function openTimer(s){tTotal=s;tLeft=s;tRun=false;clearInterval(tInt);updTDisp();document.getElementById('TIMER_SEC').style.display='block';tOpen=true;document.getElementById('T_BTN').textContent='▶ Start';document.getElementById('TIMER_SEC').scrollIntoView({behavior:'smooth',block:'nearest'});}
 function toggleTimer(){if(!tOpen)openTimer(120);else closeTimer();}
 function closeTimer(){clearInterval(tInt);tRun=false;document.getElementById('TIMER_SEC').style.display='none';tOpen=false;}
-function setTV(s){tTotal=s;tLeft=s;clearInterval(tInt);tRun=false;document.getElementById('T_BTN').textContent=L().tStart;updTDisp();}
+function setTV(s){tTotal=s;tLeft=s;clearInterval(tInt);tRun=false;document.getElementById('T_BTN').textContent='▶ Start';updTDisp();}
 function adjT(s){tLeft=Math.max(5,tLeft+s);tTotal=Math.max(tTotal,tLeft);updTDisp();}
-function resetT(){tLeft=tTotal;clearInterval(tInt);tRun=false;document.getElementById('T_BTN').textContent=L().tStart;updTDisp();}
+function resetT(){tLeft=tTotal;clearInterval(tInt);tRun=false;document.getElementById('T_BTN').textContent='▶ Start';updTDisp();}
 function toggleT(){
-  if(tRun){clearInterval(tInt);tRun=false;document.getElementById('T_BTN').textContent=L().tResume;}
+  if(tRun){clearInterval(tInt);tRun=false;document.getElementById('T_BTN').textContent='▶ Start';}
   else{
     if(tLeft<=0){resetT();return;}
-    tRun=true;document.getElementById('T_BTN').textContent=L().tPause;
+    tRun=true;document.getElementById('T_BTN').textContent='⏸ Pause';
     tInt=setInterval(function(){
       tLeft--;
-      if(tLeft<=0){tLeft=0;clearInterval(tInt);tRun=false;document.getElementById('T_BTN').textContent=L().tStart;}
+      if(tLeft<=0){tLeft=0;clearInterval(tInt);tRun=false;document.getElementById('T_BTN').textContent='▶ Start';}
       updTDisp();
     },1000);
   }
