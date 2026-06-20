@@ -189,7 +189,6 @@ select.pinp{appearance:none;}
         <button class="adjb" onclick="adjT(15)">+</button>
       </div>
       <div class="tbts">
-        <button class="tbtn" onclick="resetT()"><i class="ti ti-refresh"></i></button>
         <button class="tbtn p" id="T_BTN" onclick="toggleT()"></button>
         <button class="tbtn" id="T_CLOSE" onclick="closeTimer()"></button>
       </div>
@@ -376,7 +375,7 @@ var LNG = {
     ios1:'Safari로 GitHub Pages URL 열기', ios2:'하단 공유 버튼 → 홈 화면에 추가',
     and1:'Chrome으로 GitHub Pages URL 열기', and2:'점 3개 메뉴 → Share → Add to Home screen',
     tNext:'다음 세트까지 남은 시간', tAdj:'15초 조절', tClose:'닫기',
-    tOpen:'휴식 타이머 열기', tStart:'▶', tPause:'⏸', tResume:'▶',
+    tOpen:'휴식 타이머 열기', tStart:'Start', tPause:'Pause', tResume:'Resume',
     weekLabels:['1주 기초','2주 축적','3주 강화','4주 피크'],
     intensityLabel:'강도',
     gAdd:'기록 추가', gExL:'종목', gWtL:'중량 (kg)', gDtL:'날짜', btnLog:'기록 추가',
@@ -432,7 +431,7 @@ var LNG = {
     ios1:'Open GitHub Pages URL in Safari', ios2:'Share button → Add to Home Screen',
     and1:'Open GitHub Pages URL in Chrome', and2:'3-dot menu → Share → Add to Home screen',
     tNext:'Time until next set', tAdj:'±15s', tClose:'Close',
-    tOpen:'Rest Timer', tStart:'▶', tPause:'⏸', tResume:'▶',
+    tOpen:'Rest Timer', tStart:'Start', tPause:'Pause', tResume:'Resume',
     weekLabels:['W1 Base','W2 Volume','W3 Intensity','W4 Peak'],
     intensityLabel:'Intensity',
     gAdd:'Add Record', gExL:'Exercise', gWtL:'Weight (kg)', gDtL:'Date', btnLog:'Add',
@@ -549,7 +548,7 @@ function applyLang(){
   document.getElementById('T_ADJ').textContent=l.tAdj;
   document.getElementById('T_CLOSE').textContent='Close';
   document.getElementById('BTN_TIMER').textContent=l.tOpen;
-  document.getElementById('T_BTN').textContent=tRun?'⏸':'▶ Start';
+  document.getElementById('T_BTN').textContent=tRun?l.tPause:l.tStart;
   document.getElementById('G_ADD').textContent=l.gAdd;
   document.getElementById('G_EX_L').textContent=l.gExL;
   document.getElementById('G_WT_L').textContent=l.gWtL;
@@ -742,15 +741,6 @@ function tapSet(ds,di,ei,si,rest){
 function changeDay(d){curDay=(curDay+d+4)%4;lset('day',curDay);renderToday();}
 function resetToToday(){var auto=detectTodayDayIdx();if(auto!==null){curDay=auto;renderToday();}}
 function cycleWeek(){curWeek=(curWeek+1)%4;lset('week',curWeek);renderHeader();renderToday();toast(L().weekLabels[curWeek]);}
-function confirmResetDay(){
-  var msg=lang==='ko'?'오늘 운동 기록을 초기화할까요?':'Reset today workout records?';
-  if(!confirm(msg)) return;
-  var ds=todayStr();
-  Object.keys(setStates).forEach(function(k){ if(k.indexOf(ds)===0) delete setStates[k]; });
-  lset('sets',setStates);
-  renderToday();
-  toast(lang==='ko'?'초기화 완료':'Reset done');
-}
 function confirmResetAll(){
   var msgKo='모든 세트 기록을 초기화할까요? (PR 및 그래프 기록은 유지됩니다)';
   var msgEn='Reset all set records? PR and graph records are kept.';
@@ -762,20 +752,20 @@ function confirmResetAll(){
 }
 
 // ===== TIMER =====
-function openTimer(s){tTotal=s;tLeft=s;tRun=false;clearInterval(tInt);updTDisp();document.getElementById('TIMER_SEC').style.display='block';tOpen=true;document.getElementById('T_BTN').textContent='▶ Start';document.getElementById('TIMER_SEC').scrollIntoView({behavior:'smooth',block:'nearest'});}
+function openTimer(s){tTotal=s;tLeft=s;tRun=false;clearInterval(tInt);updTDisp();document.getElementById('TIMER_SEC').style.display='block';tOpen=true;document.getElementById('T_BTN').textContent=L().tStart;document.getElementById('TIMER_SEC').scrollIntoView({behavior:'smooth',block:'nearest'});}
 function toggleTimer(){if(!tOpen)openTimer(120);else closeTimer();}
 function closeTimer(){clearInterval(tInt);tRun=false;document.getElementById('TIMER_SEC').style.display='none';tOpen=false;}
-function setTV(s){tTotal=s;tLeft=s;clearInterval(tInt);tRun=false;document.getElementById('T_BTN').textContent='▶ Start';updTDisp();}
+function setTV(s){tTotal=s;tLeft=s;clearInterval(tInt);tRun=false;document.getElementById('T_BTN').textContent=L().tStart;updTDisp();}
 function adjT(s){tLeft=Math.max(5,tLeft+s);tTotal=Math.max(tTotal,tLeft);updTDisp();}
-function resetT(){tLeft=tTotal;clearInterval(tInt);tRun=false;document.getElementById('T_BTN').textContent='▶ Start';updTDisp();}
+function resetT(){tLeft=tTotal;clearInterval(tInt);tRun=false;document.getElementById('T_BTN').textContent=L().tStart;updTDisp();}
 function toggleT(){
-  if(tRun){clearInterval(tInt);tRun=false;document.getElementById('T_BTN').textContent='▶ Start';}
+  if(tRun){clearInterval(tInt);tRun=false;document.getElementById('T_BTN').textContent=L().tStart;}
   else{
     if(tLeft<=0){resetT();return;}
-    tRun=true;document.getElementById('T_BTN').textContent='⏸ Pause';
+    tRun=true;document.getElementById('T_BTN').textContent=L().tPause;
     tInt=setInterval(function(){
       tLeft--;
-      if(tLeft<=0){tLeft=0;clearInterval(tInt);tRun=false;document.getElementById('T_BTN').textContent='▶ Start';}
+      if(tLeft<=0){tLeft=0;clearInterval(tInt);tRun=false;document.getElementById('T_BTN').textContent=L().tStart;}
       updTDisp();
     },1000);
   }
