@@ -317,49 +317,37 @@ select.pinp{appearance:none;}
 <script>
 // ===== DATA =====
 var EX_DEFS = [
-  // Day 1 - BIG: Snatch focus (Classic lifts + Squat + Pull)
-  // Est. ~90-100 min main work
+  // Day 1 - Monday: Snatch + Buildup (60-70%)
   [
-    {prKey:'snatch',     pct:0.72, sets:5, reps:'3',   rest:180, drv:null,     acc:false},
-    {prKey:'snatch',     pct:0.88, sets:4, reps:'2',   rest:150, drv:{fromKey:'snatch',fromPct:88,label:'hangsnatch'}, acc:false},
-    {prKey:'snatch',     pct:0.90, sets:4, reps:'3',   rest:150, drv:{fromKey:'snatch',fromPct:108,label:'snatchpull'}, acc:false},
-    {prKey:'squat',      pct:0.80, sets:4, reps:'4',   rest:180, drv:null,     acc:false},
-    {prKey:'snatch',     pct:0.90, sets:3, reps:'3',   rest:150, drv:null,     acc:true},
-    {prKey:'squat',      pct:0.50, sets:3, reps:'0',   rest:60,  drv:null,     acc:true},
-    {prKey:'none',       pct:0,    sets:3, reps:'15',  rest:60,  drv:null,     acc:true}
+    {prKey:'snatch',     pct:0.65, sets:5, rest:150, drv:null, acc:false, autoReps:true},
+    {prKey:'snatch',     pct:0.75, sets:4, rest:150, drv:{fromKey:'snatch',fromPct:108,label:'snatchpull'}, acc:false, autoReps:true},
+    {prKey:'deadlift',   pct:0.70, sets:4, rest:150, drv:null, acc:false, autoReps:true},
+    {prKey:'squat',      pct:0.65, sets:4, rest:150, drv:null, acc:false, autoReps:true},
+    {prKey:'press',      pct:0.60, sets:3, rest:90,  drv:null, acc:false, autoReps:true}
   ],
-  // Day 2 - LITTLE: Technique + Pull + Press
-  // Est. ~80-90 min main work
+  // Day 2 - Tuesday: Clean & Jerk + Deadlift MAX day
   [
-    {prKey:'snatch',     pct:0.68, sets:5, reps:'2',   rest:150, drv:null,     acc:false},
-    {prKey:'cleanjerk',  pct:0.88, sets:4, reps:'3',   rest:150, drv:{fromKey:'cleanjerk',fromPct:88,label:'hangclean'}, acc:false},
-    {prKey:'cleanjerk',  pct:0.85, sets:4, reps:'3',   rest:120, drv:{fromKey:'cleanjerk',fromPct:108,label:'cleanpull'}, acc:false},
-    {prKey:'frontsquat', pct:0.70, sets:3, reps:'5',   rest:120, drv:null,     acc:false},
-    {prKey:'snatch',     pct:0.60, sets:3, reps:'3',   rest:120, drv:null,     acc:true},
-    {prKey:'press',      pct:0.60, sets:3, reps:'6',   rest:90,  drv:null,     acc:true},
-    {prKey:'none',       pct:0,    sets:3, reps:'10',  rest:60,  drv:null,     acc:true}
+    {prKey:'cleanjerk',  pct:0.70, sets:5, rest:150, drv:null, acc:false, autoReps:true},
+    {prKey:'cleanjerk',  pct:0.80, sets:4, rest:150, drv:{fromKey:'cleanjerk',fromPct:108,label:'cleanpull'}, acc:false, autoReps:true},
+    {prKey:'cleanjerk',  pct:0.65, sets:4, rest:150, drv:null, acc:false, autoReps:true},
+    {prKey:'deadlift',   pct:0.90, sets:3, rest:210, drv:null, acc:false, autoReps:true},
+    {prKey:'pinsquat',   pct:0.60, sets:3, rest:90,  drv:null, acc:true,  autoReps:true},
+    {prKey:'press',      pct:0.70, sets:3, rest:120, drv:null, acc:false, autoReps:true}
   ],
-  // Day 3 - BIG: C&J + Squat Strength (heaviest day)
-  // Est. ~95-105 min main work
+  // Day 3 - Wed/Thu: Speed (40-50%)
   [
-    {prKey:'cleanjerk',  pct:0.78, sets:5, reps:'2+1', rest:180, drv:null,     acc:false},
-    {prKey:'cleanjerk',  pct:0.72, sets:4, reps:'3',   rest:150, drv:null,     acc:false},
-    {prKey:'squat',      pct:0.85, sets:4, reps:'3',   rest:180, drv:null,     acc:false},
-    {prKey:'frontsquat', pct:0.75, sets:3, reps:'3',   rest:150, drv:null,     acc:true},
-    {prKey:'deadlift',   pct:0.75, sets:3, reps:'3',   rest:150, drv:null,     acc:true},
-    {prKey:'none',       pct:0,    sets:3, reps:'15',  rest:60,  drv:null,     acc:true},
-    {prKey:'none',       pct:0,    sets:3, reps:'0',   rest:60,  drv:null,     acc:true}
+    {prKey:'snatch',     pct:0.45, sets:4, rest:90,  drv:null, acc:false, autoReps:true},
+    {prKey:'deadlift',   pct:0.50, sets:3, rest:90,  drv:null, acc:false, autoReps:true},
+    {prKey:'squat',      pct:0.45, sets:3, rest:90,  drv:null, acc:false, autoReps:true},
+    {prKey:'press',      pct:0.45, sets:3, rest:90,  drv:null, acc:false, autoReps:true}
   ],
-  // Day 4 - LITTLE: Power + Accessory strength
-  // Est. ~80-90 min main work
+  // Day 4 - Friday: Snatch/C&J + Squat MAX day
   [
-    {prKey:'snatch',     pct:0.70, sets:5, reps:'3',   rest:150, drv:null,     acc:false},
-    {prKey:'cleanjerk',  pct:0.75, sets:4, reps:'3',   rest:150, drv:null,     acc:false},
-    {prKey:'frontsquat', pct:0.75, sets:4, reps:'4',   rest:150, drv:null,     acc:false},
-    {prKey:'deadlift',   pct:0.60, sets:3, reps:'4',   rest:120, drv:null,     acc:true},
-    {prKey:'press',      pct:0.65, sets:3, reps:'5',   rest:90,  drv:null,     acc:true},
-    {prKey:'none',       pct:0,    sets:3, reps:'12',  rest:60,  drv:null,     acc:true},
-    {prKey:'none',       pct:0,    sets:3, reps:'0',   rest:60,  drv:null,     acc:true}
+    {prKey:'snatch',     pct:0.70, sets:4, rest:150, drv:null, acc:false, autoReps:true},
+    {prKey:'cleanjerk',  pct:0.70, sets:4, rest:150, drv:null, acc:false, autoReps:true},
+    {prKey:'squat',      pct:0.90, sets:3, rest:210, drv:null, acc:false, autoReps:true},
+    {prKey:'pindeadlift',pct:0.60, sets:3, rest:90,  drv:null, acc:true,  autoReps:true},
+    {prKey:'press',      pct:0.75, sets:3, rest:120, drv:null, acc:false, autoReps:true}
   ]
 ];
 
@@ -407,16 +395,16 @@ var LNG = {
       rdl:'루마니안 데드리프트', sngrip:'스내치 그립 데드리프트', ohs:'오버헤드 스쿼트'
     },
     dayDefs:[
-      {title:'Day 1', sub:'스내치 중심 (빅 데이)'},
-      {title:'Day 2', sub:'기술 + 풀 + 보조 (리틀 데이)'},
-      {title:'Day 3', sub:'클린&저크 + 최대 근력 (빅 데이)'},
-      {title:'Day 4', sub:'파워 + 보조 강화 (리틀 데이)'}
+      {title:'Day 1', sub:'스내치 + 빌드업 (60~70%)'},
+      {title:'Day 2', sub:'클린&저크 + 데드리프트 맥스'},
+      {title:'Day 3', sub:'스피드 (40~50%)'},
+      {title:'Day 4', sub:'스내치/C&J + 스쿼트 맥스'}
     ],
     exNames2:[
-      ['풀 스내치','행 스내치','스내치 풀','백 스쿼트','오버헤드 스쿼트 (스내치 받기)','바벨 하이퍼익스텐션','크런치 / 복근'],
-      ['파워 스내치','행 클린','클린 풀','프론트 스쿼트','스내치 밸런스','비하인드 넥 스내치 프레스','힙 브릿지'],
-      ['풀 클린&저크','파워 저크','백 스쿼트','프론트 스쿼트 (클린 받기)','핀 데드리프트','바벨 하이퍼익스텐션','푸시업'],
-      ['파워 스내치','스플릿 저크','프론트 스쿼트','핀 스쿼트','오버헤드 프레스','V-싯업','할로우 바디 홀드']
+      ['풀 스내치','스내치 풀','스내치 데드리프트','백 스쿼트','오버헤드 프레스'],
+      ['풀 클린&저크','클린 풀','스플릿 저크','데드리프트 (맥스)','핀 스쿼트','오버헤드 프레스'],
+      ['파워 스내치','스티프 레그 데드리프트','백 스쿼트 (스피드)','오버헤드 프레스'],
+      ['풀 스내치','풀 클린&저크','백 스쿼트 (맥스)','핀 데드리프트','오버헤드 프레스']
     ],
     logOpts:[
       {v:'snatch',l:'풀 스내치'},{v:'cleanjerk',l:'클린&저크'},{v:'deadlift',l:'데드리프트'},
@@ -463,16 +451,16 @@ var LNG = {
       pinsquat:'Pin Squat', pindeadlift:'Pin Deadlift'
     },
     dayDefs:[
-      {title:'Day 1', sub:'Snatch Focus (Big Day)'},
-      {title:'Day 2', sub:'Technique + Pull + Accessory (Little Day)'},
-      {title:'Day 3', sub:'C&J + Max Strength (Big Day)'},
-      {title:'Day 4', sub:'Power + Accessory Strength (Little Day)'}
+      {title:'Day 1', sub:'Snatch + Buildup (60-70%)'},
+      {title:'Day 2', sub:'C&J + Deadlift Max Day'},
+      {title:'Day 3', sub:'Speed (40-50%)'},
+      {title:'Day 4', sub:'Snatch/C&J + Squat Max Day'}
     ],
     exNames2:[
-      ['Full Snatch','Hang Snatch','Snatch Pull','Back Squat','Overhead Squat (Snatch Receiving)','Barbell Hyperextension','Crunch / Abs'],
-      ['Power Snatch','Hang Clean','Clean Pull','Front Squat','Snatch Balance','Behind-Neck Snatch Press','Hip Bridge'],
-      ['Full Clean & Jerk','Power Jerk','Back Squat','Front Squat (Clean Receiving)','Pin Deadlift','Barbell Hyperextension','Push-Up'],
-      ['Power Snatch','Split Jerk','Front Squat','Pin Squat','Overhead Press','V-Sit','Hollow Body Hold']
+      ['Full Snatch','Snatch Pull','Snatch Deadlift','Back Squat','Overhead Press'],
+      ['Full Clean & Jerk','Clean Pull','Split Jerk','Deadlift (Max)','Pin Squat','Overhead Press'],
+      ['Power Snatch','Stiff-Leg Deadlift','Back Squat (Speed)','Overhead Press'],
+      ['Full Snatch','Full Clean & Jerk','Back Squat (Max)','Pin Deadlift','Overhead Press']
     ],
     logOpts:[
       {v:'snatch',l:'Full Snatch'},{v:'cleanjerk',l:'Clean & Jerk'},{v:'deadlift',l:'Deadlift'},
@@ -532,6 +520,18 @@ function calcW(ex,wk){
 }
 function isBodyweight(ex){ return ex.prKey==='none'||ex.pct===0; }
 function isAccessory(ex){ return ex.acc===true; }
+function getEffectivePct(ex,wk){ return ex.pct*(1+wk*(progRate/100)); }
+function getAutoReps(effPct){
+  if(effPct>=0.85) return 1;
+  if(effPct>=0.75) return 2;
+  if(effPct>=0.65) return 3;
+  if(effPct>=0.55) return 4;
+  return 5;
+}
+function getDisplayReps(ex,wk){
+  if(ex.autoReps) return getAutoReps(getEffectivePct(ex,wk));
+  return ex.reps;
+}
 function getWeekMult(i){return 1+i*(progRate/100);}
 function toast(m){var t=document.getElementById('TOAST');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2500);}
 function dStr(y,m,d){return y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');}
@@ -627,7 +627,7 @@ function calcDayVolume(dayIdx, weekIdx){
   EX_DEFS[dayIdx].forEach(function(ex){
     if(isBodyweight(ex)||ex.acc) return;
     var w=calcW(ex,weekIdx);
-    var reps=parseInt(ex.reps)||1;
+    var reps=ex.autoReps?getAutoReps(getEffectivePct(ex,weekIdx)):(parseInt(ex.reps)||1);
     var vol=w*reps*ex.sets;
     totalKg+=vol; totalReps+=reps*ex.sets;
     // Olympic lifts only for Prilepin
@@ -752,7 +752,7 @@ function renderToday(){
     var chipHtml=bw
       ?'<span class="wchip" style="background:var(--sf);color:var(--tx2);">'+(lang==='ko'?'맨몸':'BW')+'</span>'
       :'<span class="wchip">'+w+' kg</span>';
-    var repsDisp=ex.reps==='0'?('30s'):ex.reps;
+    var repsDisp=ex.reps==='0'?('30s'):getDisplayReps(ex,curWeek);
 
     var srow=document.createElement('div');
     srow.className='srow';
@@ -999,7 +999,7 @@ function renderProgram(){
       var acc=isAccessory(ex);
       var note=ex.drv?'<div class="pexnote">= '+l.exNames[ex.drv.fromKey]+' PR × '+ex.drv.fromPct+'%</div>':'';
       var accTag=acc?'<span style="font-size:10px;color:#BA7517;"> ('+(lang==='ko'?'보조':'acc')+')</span>':'';
-      var repsDisp=ex.reps==='0'?('30s'):ex.reps;
+      var repsDisp=ex.reps==='0'?('30s'):getDisplayReps(ex,curWeek);
       var wdisp=bw?(lang==='ko'?'맨몸':'BW'):(w+'kg');
       return '<div class="pexr"><div><span class="pexn">'+nm+accTag+'</span>'+note+'</div><div class="pexrv">'+ex.sets+'×'+repsDisp+'<br><b>'+wdisp+'</b></div></div>';
     }).join('');
